@@ -1,48 +1,44 @@
+import { Link,useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import { Home, User, Lock } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 const Login = () => {
+  const navigate = useNavigate();
   const { login } = useApp();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
 
-  // Demo users (no TypeScript types needed)
-  const demoUsers = [
-    {
-      id: '1',
-      name: 'Sarah Johnson',
-      email: 'sarah@example.com',
-      apartment: '201',
-      phone: '+1-555-0123',
-      role: 'resident',
-    },
-    {
-      id: '2',
-      name: 'Admin User',
-      email: 'admin@example.com',
-      apartment: 'Office',
-      phone: '+1-555-0100',
-      role: 'admin',
-    },
-  ];
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  try {
+    const res = await fetch('http://localhost:8001/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // if you're using cookies
+      body: JSON.stringify(formData),
+    });
 
-    const user = demoUsers.find((u) => u.email === formData.email);
-    if (user) {
-      login(user);
-    } else {
-      alert('Invalid credentials. Try: sarah@example.com or admin@example.com');
+    const data = await res.json();
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      alert(errorData.message);
     }
-  };
+    login(data.user); // use the real user object
+    localStorage.setItem('token', data.accessToken);
+    setFormData({ email: '', password: '' }); 
+      navigate('/');
+  } catch (err) {
+    alert(err.message);
+  }
+};
 
-  const handleDemoLogin = (user) => {
-    login(user);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50 flex items-center justify-center p-4">
@@ -61,12 +57,13 @@ const Login = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email Address
+               email
               </label>
               <div className="mt-1 relative">
                 <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                 <input
                   id="email"
+                  name='email'
                   type="email"
                   required
                   value={formData.email}
@@ -79,7 +76,7 @@ const Login = () => {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
+                password
               </label>
               <div className="mt-1 relative">
                 <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
@@ -103,21 +100,11 @@ const Login = () => {
             </button>
           </form>
 
-          <div className="mt-6 border-t border-gray-200 pt-6">
-            <p className="text-sm text-gray-600 text-center mb-4">Demo Accounts:</p>
-            <div className="space-y-2">
-              {demoUsers.map((user) => (
-                <button
-                  key={user.id}
-                  onClick={() => handleDemoLogin(user)}
-                  className="w-full text-left p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-                >
-                  <div className="font-medium text-sm">{user.name}</div>
-                  <div className="text-xs text-gray-500">{user.email} • {user.role}</div>
-                </button>
-              ))}
-            </div>
-          </div>
+          <p className="text-sm mt-4">
+  Don't have an account? <Link to="/signup" className="text-blue-500 underline">Sign up here</Link>
+</p>
+
+       
         </div>
       </div>
     </div>

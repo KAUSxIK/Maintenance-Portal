@@ -1,7 +1,8 @@
 import React from 'react';
-import { Calendar, AlertCircle, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Calendar, AlertCircle, CheckCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { format, isToday, isTomorrow } from 'date-fns';
+import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
   const { user, bookings, complaints } = useApp();
@@ -59,9 +60,11 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-4 max-w-7xl mx-auto">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Welcome back, {user?.name}!</h1>
+        <h1 className="text-2xl font-bold text-gray-900">
+          Welcome back, {user?.name || user?.username || 'User'}!
+        </h1>
         <p className="text-gray-600">Here's what's happening in your community</p>
       </div>
 
@@ -87,7 +90,7 @@ const Dashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Upcoming Bookings */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900">Upcoming Bookings</h2>
             <Calendar className="h-5 w-5 text-gray-400" />
@@ -96,7 +99,7 @@ const Dashboard = () => {
           {upcomingBookings.length === 0 ? (
             <p className="text-gray-500 text-center py-4">No upcoming bookings</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-3 flex-grow">
               {upcomingBookings.map((booking) => (
                 <div key={booking.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div>
@@ -114,6 +117,9 @@ const Dashboard = () => {
               ))}
             </div>
           )}
+          <Link to="/bookings" className="mt-4 text-sm text-blue-600 hover:underline self-start">
+            View all
+          </Link>
         </div>
 
         {/* Recent Complaints */}
@@ -136,7 +142,9 @@ const Dashboard = () => {
                         {format(new Date(complaint.createdAt), 'MMM d, yyyy')}
                       </p>
                     </div>
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(complaint.status)}`}>
+                    <span
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(complaint.status)}`}
+                    >
                       {complaint.status.replace('-', ' ')}
                     </span>
                   </div>
@@ -144,10 +152,16 @@ const Dashboard = () => {
               ))}
             </div>
           )}
+            <Link to="/complaints" className="mt-4 text-sm text-blue-600 hover:underline self-start block">
+    View all
+  </Link>
         </div>
       </div>
     </div>
+    
   );
 };
 
+
 export default Dashboard;
+

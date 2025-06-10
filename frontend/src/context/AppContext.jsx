@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+
 const AppContext = createContext(undefined);
 
 export const useApp = () => {
@@ -16,6 +17,7 @@ export const AppProvider = ({ children }) => {
   const [complaints, setComplaints] = useState([]);
 
   useEffect(() => {
+  try {
     const savedUser = localStorage.getItem('community-portal-user');
     const savedBookings = localStorage.getItem('community-portal-bookings');
     const savedComplaints = localStorage.getItem('community-portal-complaints');
@@ -23,7 +25,20 @@ export const AppProvider = ({ children }) => {
     if (savedUser) setUser(JSON.parse(savedUser));
     if (savedBookings) setBookings(JSON.parse(savedBookings));
     if (savedComplaints) setComplaints(JSON.parse(savedComplaints));
-  }, []);
+  } catch (err) {
+    console.error("Failed to parse localStorage data:", err);
+    // Optionally clear corrupted data:
+    localStorage.removeItem('community-portal-user');
+    localStorage.removeItem('community-portal-bookings');
+    localStorage.removeItem('community-portal-complaints');
+  }
+}, []);
+
+
+    
+
+
+
 
   const login = (userData) => {
     setUser(userData);
@@ -89,6 +104,7 @@ export const AppProvider = ({ children }) => {
         user,
         bookings: user ? bookings.filter((b) => b.userId === user.id) : [],
         complaints: user ? complaints.filter((c) => c.userId === user.id) : [],
+
         login,
         logout,
         addBooking,

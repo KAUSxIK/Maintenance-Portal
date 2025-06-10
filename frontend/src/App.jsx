@@ -1,46 +1,37 @@
-import React, { useState } from 'react';
-import { AppProvider, useApp } from './context/AppContext';
+import { BrowserRouter , Routes, Route, Navigate } from 'react-router-dom';
+import { AppProvider } from './context/AppContext';
 import Login from './components/Login';
-import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import BookingPage from './components/BookingPage';
 import ComplaintsPage from './components/ComplaintsPage';
 import AdminPanel from './components/AdminPanel';
+import Signup from './components/SignupPage';
+import { useApp } from './context/AppContext';
 
-const AppContent = () => {
-  const { user } = useApp();
-  const [currentPage, setCurrentPage] = useState('dashboard');
 
-  if (!user) {
-    return <Login />;
-  }
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'dashboard':
-        return <Dashboard />;
-      case 'bookings':
-        return <BookingPage />;
-      case 'complaints':
-        return <ComplaintsPage />;
-      case 'admin':
-        return user.role === 'admin' ? <AdminPanel /> : <Dashboard />;
-      default:
-        return <Dashboard />;
-    }
-  };
-
-  return (
-    <Layout currentPage={currentPage} onPageChange={setCurrentPage}>
-      {renderPage()}
-    </Layout>
-  );
-};
+  
 
 function App() {
+  const{user}=useApp();
   return (
     <AppProvider>
-      <AppContent />
+    <BrowserRouter>
+    <Routes>
+      <Route path='/'  element={<Dashboard/>}/>
+      <Route path='/bookings'  element={<BookingPage/>}/>
+      <Route path='/complaints'  element={<ComplaintsPage/>}/>
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+       <Route
+            path="/admin"
+            element={
+              user && user.isAdmin ? <AdminPanel /> : <Navigate to="/login" />
+            }
+          />
+      
+
+    </Routes>
+    </BrowserRouter>
     </AppProvider>
   );
 }

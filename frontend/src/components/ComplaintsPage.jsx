@@ -103,7 +103,7 @@ const ComplaintsPage = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 mt-20">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Maintenance Complaints</h1>

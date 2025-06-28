@@ -1,4 +1,4 @@
-import { Link,useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import { Home, User, Lock } from 'lucide-react';
 import { useApp } from '../context/AppContext';
@@ -11,34 +11,34 @@ const Login = () => {
     password: '',
   });
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  try {
-    const res = await fetch('http://localhost:8001/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include', // if you're using cookies
-      body: JSON.stringify(formData),
-    });
+    try {
+      const res = await fetch('http://localhost:8001/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(formData),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) {
-      const errorData = await res.json();
-      alert(errorData.message);
-    }
-    login(data.user); // use the real user object
-    localStorage.setItem('token', data.accessToken);
-    setFormData({ email: '', password: '' }); 
+      if (!res.ok) {
+        alert(data.message || 'Login failed');
+        return;
+      }
+
+      login(data.user);
+      localStorage.setItem('token', data.accessToken);
+      setFormData({ email: '', password: '' });
       navigate('/');
-  } catch (err) {
-    alert(err.message);
-  }
-};
-
+    } catch (err) {
+      alert(err.message || 'Something went wrong');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50 flex items-center justify-center p-4">
@@ -57,13 +57,13 @@ const Login = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-               email
+                Email
               </label>
               <div className="mt-1 relative">
                 <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                 <input
                   id="email"
-                  name='email'
+                  name="email"
                   type="email"
                   required
                   value={formData.email}
@@ -76,7 +76,7 @@ const Login = () => {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                password
+                Password
               </label>
               <div className="mt-1 relative">
                 <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
@@ -101,10 +101,11 @@ const Login = () => {
           </form>
 
           <p className="text-sm mt-4">
-  Don't have an account? <Link to="/signup" className="text-blue-500 underline">Sign up here</Link>
-</p>
-
-       
+            Don't have an account?{' '}
+            <Link to="/signup" className="text-blue-500 underline">
+              Sign up here
+            </Link>
+          </p>
         </div>
       </div>
     </div>

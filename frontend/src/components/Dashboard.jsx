@@ -3,6 +3,7 @@ import { Calendar, AlertCircle, CheckCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { format, isToday, isTomorrow } from 'date-fns';
 import { Link } from 'react-router-dom';
+import Banner from './Banner';
 
 const Dashboard = () => {
   const { user, bookings, complaints } = useApp();
@@ -60,7 +61,8 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="space-y-8 p-4 max-w-7xl mx-auto">
+    <div className="space-y-8 mt-20 p-4 max-w-7xl mx-auto">
+      
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
           Welcome back, {user?.name || user?.username || 'User'}!

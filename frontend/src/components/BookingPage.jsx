@@ -63,7 +63,7 @@ const BookingPage = () => {
   const userBookings = bookings.filter(b => b.userId === user?.id);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8  mt-20">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Book Facility</h1>
         <p className="text-gray-600">Reserve washing machine or pantry slots</p>

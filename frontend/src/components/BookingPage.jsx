@@ -1,13 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, WashingMachine, ChefHat, CheckCircle, XCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { format, addDays } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 const BookingPage = () => {
   const { user, addBooking, bookings, cancelBooking } = useApp();
   const [selectedFacility, setSelectedFacility] = useState('washing-machine');
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [selectedTime, setSelectedTime] = useState('');
+  const navigate = useNavigate();
+
+  // ✅ Redirect if not logged in
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
+
+  if (!user) return null; // Prevent rendering if not logged in
 
   const facilities = [
     { id: 'washing-machine', name: 'Washing Machine', icon: WashingMachine, color: 'blue' },
@@ -60,10 +71,10 @@ const BookingPage = () => {
     alert('Booking confirmed successfully!');
   };
 
-  const userBookings = bookings.filter(b => b.userId === user?.id);
+  const userBookings = bookings.filter(b => b.userId === user.id);
 
   return (
-    <div className="space-y-8  mt-20">
+    <div className="space-y-8 mt-20">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Book Facility</h1>
         <p className="text-gray-600">Reserve washing machine or pantry slots</p>
@@ -90,12 +101,20 @@ const BookingPage = () => {
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
-                    <Icon className={`h-8 w-8 mx-auto mb-2 ${
-                      selectedFacility === facility.id ? `text-${facility.color}-600` : 'text-gray-400'
-                    }`} />
-                    <p className={`text-sm font-medium ${
-                      selectedFacility === facility.id ? `text-${facility.color}-700` : 'text-gray-600'
-                    }`}>
+                    <Icon
+                      className={`h-8 w-8 mx-auto mb-2 ${
+                        selectedFacility === facility.id
+                          ? `text-${facility.color}-600`
+                          : 'text-gray-400'
+                      }`}
+                    />
+                    <p
+                      className={`text-sm font-medium ${
+                        selectedFacility === facility.id
+                          ? `text-${facility.color}-700`
+                          : 'text-gray-600'
+                      }`}
+                    >
                       {facility.name}
                     </p>
                   </button>
@@ -188,11 +207,13 @@ const BookingPage = () => {
                         <p className="text-sm text-gray-600">Time: {booking.timeSlot}</p>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          booking.status === 'confirmed'
-                            ? 'text-green-700 bg-green-100'
-                            : 'text-red-700 bg-red-100'
-                        }`}>
+                        <span
+                          className={`px-2 py-1 text-xs font-medium rounded-full ${
+                            booking.status === 'confirmed'
+                              ? 'text-green-700 bg-green-100'
+                              : 'text-red-700 bg-red-100'
+                          }`}
+                        >
                           {booking.status === 'confirmed' ? (
                             <CheckCircle className="h-3 w-3 inline mr-1" />
                           ) : (
@@ -221,3 +242,4 @@ const BookingPage = () => {
 };
 
 export default BookingPage;
+

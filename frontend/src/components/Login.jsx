@@ -1,15 +1,20 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import { Home, User, Lock } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useApp();
+  const { user, login } = useApp();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
+
+  // ✅ Redirect if already logged in
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,16 +30,27 @@ const Login = () => {
       });
 
       const data = await res.json();
+console.log("Login response:", data); // 🔍
 
       if (!res.ok) {
         alert(data.message || 'Login failed');
         return;
       }
 
-      login(data.user);
-      localStorage.setItem('token', data.accessToken);
+      const user = data.data?.user;
+const token = data.data?.accessToken;
+
+if (!user || !token) {
+  alert("Login response invalid");
+  return;
+}
+
+login(user);
+localStorage.setItem("token", token);
+localStorage.setItem("community-portal-user", JSON.stringify(user));
+
       setFormData({ email: '', password: '' });
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       alert(err.message || 'Something went wrong');
     }

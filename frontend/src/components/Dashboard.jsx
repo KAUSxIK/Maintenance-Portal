@@ -3,10 +3,21 @@ import { Calendar, AlertCircle, CheckCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { format, isToday, isTomorrow } from 'date-fns';
 import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import Banner from './Banner';
 
 const Dashboard = () => {
   const { user, bookings, complaints } = useApp();
+  const navigate = useNavigate(); 
+   useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
+   if (!user) return null;
+
 
   const upcomingBookings = bookings
     .filter(b => b.status === 'confirmed' && new Date(b.date) >= new Date())

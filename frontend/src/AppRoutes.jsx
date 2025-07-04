@@ -9,10 +9,11 @@ import Dashboard from './components/Dashboard';
 import BookingPage from './components/BookingPage';
 import ComplaintsPage from './components/ComplaintsPage';
 import AdminPanel from './components/AdminPanel';
-import { Home } from 'lucide-react';
 import Front from './components/Front';
 import About from './components/About';
 import Footer from './components/Footer';
+
+import PrivateRoute from './components/PrivateRoute'; // ✅ Import
 
 export const AppRoutes = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -22,15 +23,38 @@ export const AppRoutes = () => {
 
   return (
     <>
-     {!isAdminPath && <Navbar key={user?.id || 'guest'} setShowLogin={setShowLogin} />}
+      {!isAdminPath && <Navbar key={user?.id || 'guest'} setShowLogin={setShowLogin} />}
       <Routes>
-        <Route path="/" element={<Front/>} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/bookings" element={<BookingPage />} />
-        <Route path="/complaints" element={<ComplaintsPage />} />
+        <Route path="/" element={<Front />} />
+        <Route path="/about" element={<About />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/about" element={<About />} />
+
+        {/* ✅ Protected Routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/bookings"
+          element={
+            <PrivateRoute>
+              <BookingPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/complaints"
+          element={
+            <PrivateRoute>
+              <ComplaintsPage />
+            </PrivateRoute>
+          }
+        />
 
         <Route
           path="/admin"
@@ -39,9 +63,8 @@ export const AppRoutes = () => {
           }
         />
       </Routes>
-      <Footer/>
+      <Footer />
     </>
   );
 };
-
 

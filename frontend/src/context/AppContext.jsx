@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-
+// Create context
 const AppContext = createContext(undefined);
 
+// Custom hook to use AppContext
 export const useApp = () => {
   const context = useContext(AppContext);
   if (!context) {
@@ -11,45 +12,50 @@ export const useApp = () => {
   return context;
 };
 
+// Safe JSON parser
+const safeParse = (item) => {
+  try {
+    if (!item || item === 'undefined') return null;
+    return JSON.parse(item);
+  } catch {
+    return null;
+  }
+};
+
 export const AppProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [complaints, setComplaints] = useState([]);
 
+  // Load from localStorage on first render
   useEffect(() => {
-  try {
-    const savedUser = localStorage.getItem('community-portal-user');
-    const savedBookings = localStorage.getItem('community-portal-bookings');
-    const savedComplaints = localStorage.getItem('community-portal-complaints');
+    const savedUser = safeParse(localStorage.getItem('user'));
+    const savedBookings = safeParse(localStorage.getItem('community-portal-bookings'));
+    const savedComplaints = safeParse(localStorage.getItem('community-portal-complaints'));
 
-    if (savedUser) setUser(JSON.parse(savedUser));
-    if (savedBookings) setBookings(JSON.parse(savedBookings));
-    if (savedComplaints) setComplaints(JSON.parse(savedComplaints));
-  } catch (err) {
-    console.error("Failed to parse localStorage data:", err);
-    // Optionally clear corrupted data:
-    localStorage.removeItem('community-portal-user');
-    localStorage.removeItem('community-portal-bookings');
-    localStorage.removeItem('community-portal-complaints');
-  }
-}, []);
+    if (savedUser) setUser(savedUser);
+    if (savedBookings) setBookings(savedBookings);
+    if (savedComplaints) setComplaints(savedComplaints);
+  }, []);
 
-
-    
-
-
-
-
+  // Login user and save to localStorage
   const login = (userData) => {
     setUser(userData);
-    localStorage.setItem('community-portal-user', JSON.stringify(userData));
+    localStorage.setItem('user', JSON.stringify(userData));
   };
 
+  // Logout user and clear data
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('community-portal-user');
+    setBookings([]);
+    setComplaints([]);
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('community-portal-bookings');
+    localStorage.removeItem('community-portal-complaints');
   };
 
+  // Booking handlers
   const addBooking = (bookingData) => {
     const newBooking = {
       ...bookingData,
@@ -69,6 +75,7 @@ export const AppProvider = ({ children }) => {
     localStorage.setItem('community-portal-bookings', JSON.stringify(updatedBookings));
   };
 
+  // Complaint handlers
   const addComplaint = (complaintData) => {
     const newComplaint = {
       ...complaintData,
@@ -95,24 +102,20 @@ export const AppProvider = ({ children }) => {
     localStorage.setItem('community-portal-complaints', JSON.stringify(updatedComplaints));
   };
 
-  const getAllBookings = () => bookings;
-  const getAllComplaints = () => complaints;
-
   return (
     <AppContext.Provider
       value={{
         user,
-        bookings: user ? bookings.filter((b) => b.userId === user.id) : [],
-        complaints: user ? complaints.filter((c) => c.userId === user.id) : [],
-
+        bookings: user ? bookings.filter((b) => b.userId === user.id || user.isAdmin) : [],
+        complaints: user ? complaints.filter((c) => c.userId === user.id || user.isAdmin) : [],
         login,
         logout,
         addBooking,
         cancelBooking,
         addComplaint,
         updateComplaintStatus,
-        getAllBookings,
-        getAllComplaints,
+        getAllBookings: () => bookings,
+        getAllComplaints: () => complaints,
       }}
     >
       {children}

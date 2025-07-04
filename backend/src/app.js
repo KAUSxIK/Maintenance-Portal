@@ -6,7 +6,7 @@ const app=express()
 app.use(cors({
     origin: 'http://localhost:5173',
     methods:"GET, POST, PUT, DELETE, PATCH, HEAD", // Specify the allowed origin
-    credentials: true, // Allow credentials
+    credentials: true  // Allow credentials
 }));
 
 

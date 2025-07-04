@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { AlertCircle, Plus, FileText, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 const priorities = [
   { value: 'low', label: 'Low', color: 'text-gray-700 bg-gray-100' },
@@ -47,6 +48,7 @@ const getPriorityColor = (priority) => {
 
 const ComplaintsPage = () => {
   const { user, complaints, addComplaint } = useApp();
+  const navigate = useNavigate(); // ✅ required for redirect
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     category: 'plumbing',
@@ -57,11 +59,14 @@ const ComplaintsPage = () => {
 
   const titleRef = useRef(null);
 
+  // ✅ Redirect if not logged in
   useEffect(() => {
-    if (showForm && titleRef.current) {
-      titleRef.current.focus();
+    if (!user) {
+      navigate('/login');
     }
-  }, [showForm]);
+  }, [user, navigate]);
+
+  if (!user) return null; // Prevent rendering before redirect
 
   const categories = [
     { value: 'plumbing', label: 'Plumbing' },
@@ -71,10 +76,14 @@ const ComplaintsPage = () => {
     { value: 'other', label: 'Other' },
   ];
 
+  useEffect(() => {
+    if (showForm && titleRef.current) {
+      titleRef.current.focus();
+    }
+  }, [showForm]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!user) return;
-
     if (!formData.title.trim() || !formData.description.trim()) {
       alert("Title and description cannot be empty.");
       return;
@@ -90,7 +99,7 @@ const ComplaintsPage = () => {
       priority: formData.priority,
       status: 'pending',
       createdAt: new Date().toISOString(),
-      id: Math.random().toString(36).substr(2, 9), // or use better unique id
+      id: Math.random().toString(36).substr(2, 9),
     });
 
     setFormData({

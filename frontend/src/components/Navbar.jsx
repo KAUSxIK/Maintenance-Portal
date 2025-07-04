@@ -9,8 +9,21 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user, logout } = useApp();
 
-  // Hide navbar on /admin routes
+  // Hide navbar on admin panel
   if (location.pathname.startsWith("/admin")) return null;
+
+  const handleLogout = () => {
+    logout();
+    setMenuOpen(false);
+    navigate("/");
+  };
+
+  const handleLogin = () => {
+    setMenuOpen(false);
+    navigate("/login");
+  };
+
+  const linkClass = "text-white hover:text-gray-300 font-medium";
 
   return (
     <nav className="bg-[#800000] shadow-md fixed top-0 left-0 w-full z-50">
@@ -21,34 +34,31 @@ const Navbar = () => {
             Kapili Maintenance
           </NavLink>
 
-          {/* Desktop Menu */}
+          {/* Desktop Links */}
           <div className="hidden md:flex space-x-8 items-center">
-            <NavLink to="/" className="text-white hover:text-gray-300 font-medium">Home</NavLink>
-            <NavLink to="/dashboard" className="text-white hover:text-gray-300 font-medium">Dashboard</NavLink>
-            <NavLink to="/bookings" className="text-white hover:text-gray-300 font-medium">Bookings</NavLink>
-            <NavLink to="/complaints" className="text-white hover:text-gray-300 font-medium">Complaints</NavLink>
+            <NavLink to="/" className={linkClass}>Home</NavLink>
+            <NavLink to="/dashboard" className={linkClass}>Dashboard</NavLink>
+            <NavLink to="/bookings" className={linkClass}>Bookings</NavLink>
+            <NavLink to="/complaints" className={linkClass}>Complaints</NavLink>
 
             {user ? (
               <button
-                onClick={() => {
-                  logout();
-                  navigate("/");
-                }}
+                onClick={handleLogout}
                 className="bg-white text-[#800000] px-6 py-2 rounded hover:bg-gray-200 transition-all font-semibold"
               >
                 Logout
               </button>
             ) : (
               <button
-                onClick={() => navigate('/login')}
-                className="cursor-pointer bg-white text-[#800000] px-6 py-2 rounded hover:bg-gray-200 transition-all font-semibold"
+                onClick={handleLogin}
+                className="bg-white text-[#800000] px-6 py-2 rounded hover:bg-gray-200 transition-all font-semibold"
               >
                 Login
               </button>
             )}
           </div>
 
-          {/* Mobile Menu Icon */}
+          {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center">
             <button onClick={() => setMenuOpen(!menuOpen)} className="text-white">
               {menuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -57,27 +67,24 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Dropdown Menu */}
       {menuOpen && (
         <div className="md:hidden bg-[#800000] px-4 pt-2 pb-4 shadow">
-          <NavLink to="/" className="block py-2 text-white hover:text-gray-300">Home</NavLink>
-          <NavLink to="/dashboard" className="block py-2 text-white hover:text-gray-300">Dashboard</NavLink>
-          <NavLink to="/bookings" className="block py-2 text-white hover:text-gray-300">Bookings</NavLink>
-          <NavLink to="/complaints" className="block py-2 text-white hover:text-gray-300">Complaints</NavLink>
+          <NavLink to="/" onClick={() => setMenuOpen(false)} className="block py-2 text-white hover:text-gray-300">Home</NavLink>
+          <NavLink to="/dashboard" onClick={() => setMenuOpen(false)} className="block py-2 text-white hover:text-gray-300">Dashboard</NavLink>
+          <NavLink to="/bookings" onClick={() => setMenuOpen(false)} className="block py-2 text-white hover:text-gray-300">Bookings</NavLink>
+          <NavLink to="/complaints" onClick={() => setMenuOpen(false)} className="block py-2 text-white hover:text-gray-300">Complaints</NavLink>
 
           {user ? (
             <button
-              onClick={() => {
-                logout();
-                navigate("/");
-              }}
+              onClick={handleLogout}
               className="block w-full py-2 mt-2 bg-white text-[#800000] text-center rounded hover:bg-gray-200 font-semibold"
             >
               Logout
             </button>
           ) : (
             <button
-              onClick={() => navigate('/login')}
+              onClick={handleLogin}
               className="block w-full py-2 mt-2 bg-white text-[#800000] text-center rounded hover:bg-gray-200 font-semibold"
             >
               Login
